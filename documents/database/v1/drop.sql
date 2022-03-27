@@ -1,0 +1,1 @@
+DROP TABLE users, street_arts, images;
