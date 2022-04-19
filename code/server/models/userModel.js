@@ -9,6 +9,7 @@ module.exports.getAllUsers = async () => {
 
     return { status: 200, result };
   } catch (error) {
+    console.log(error)
     return { status: 500, result: error };
   }
 };
