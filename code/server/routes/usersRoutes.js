@@ -9,4 +9,18 @@ router.get("/", async (req, res) => {
   res.status(status).json(result);
 });
 
+router.post("/login", async (req, res) => {
+  const user = req.body;
+  const { status, result } = await userModel.login(user);
+
+  res.status(status).send(result);
+});
+
+router.post("/register", async (req, res) => {
+  const user = req.body;
+  const { status, result } = await userModel.register(user);
+
+  res.status(status).send(result);
+});
+
 module.exports = router;
