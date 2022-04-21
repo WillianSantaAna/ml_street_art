@@ -1,6 +1,7 @@
 const pool = require("./connection");
 const tf = require('@tensorflow/tfjs-node');
 const Jimp = require('jimp');
+const labels = ["Arm Collective", "Mar", "União Artistica do Trancão"];
 
 module.exports.getAllStreetArts = async () => {
   try {
@@ -43,8 +44,15 @@ module.exports.predict = async (tempImgPath) => {
     img_tensor = img_tensor.expandDims(0);
 
     const predictions = await model.predict(img_tensor).dataSync();
+    
+    const resultPredictions = labels.map((v, k) => {
+      return {
+        author: v,
+        prediction: predictions[k]
+      }; 
+    });
 
-    return { status: 200, result: predictions };
+    return { status: 200, result: resultPredictions };
   } catch (error) {
     console.log(error)
     return { status: 500, result: error };
