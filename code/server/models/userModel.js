@@ -11,13 +11,13 @@ module.exports.getAllUsers = async () => {
 
     return { status: 200, result };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return { status: 500, result: error };
   }
 };
 
 module.exports.register = async (user) => {
-  const { name, email, password, type } = user;
+  const { name, email, password } = user;
 
   if (typeof user !== "object") {
     return { status: 400, result: { msg: "Malformed data" } };
@@ -35,22 +35,18 @@ module.exports.register = async (user) => {
     return { status: 400, result: { msg: "Invalid password" } };
   }
 
-  if (typeof type !== "string" || email.length < 3) {
-    return { status: 400, result: { msg: "Invalid type" } };
-  }
-
   try {
     const hash = await bcrypt.hash(password, saltRounds);
 
-    const sql = `insert into users (usr_name, usr_email, usr_password, usr_type)
-      values ($1, $2, $3, $4) returning usr_id, usr_name`;
-    let result = await pool.query(sql, [name, email, hash, type]);
+    const sql = `insert into users (usr_name, usr_email, usr_password)
+      values ($1, $2, $3) returning usr_id, usr_name, usr_type`;
+    let result = await pool.query(sql, [name, email, hash]);
 
     result = result.rows[0];
 
     return { status: 200, result };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return { status: 500, result: error };
   }
 };
@@ -78,7 +74,7 @@ module.exports.login = async (user) => {
 
     return { status: 200, result };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return { status: 500, result: error };
   }
 };
