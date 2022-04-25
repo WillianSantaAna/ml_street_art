@@ -2,13 +2,13 @@ BEGIN;
 -- users
 
 INSERT INTO users (usr_name, usr_email, usr_password, usr_type)
-	VALUES ('Felipe Silva', 'felipe@email.com', '123456', 'admin');
+	VALUES ('Felipe Silva', 'felipe@email.com', '$2b$10$SM3l2psCKsDHqIVmVkvpiu65KlrVhMD16pnuBMUB5mHyT6rdnBo2C', 'admin');
 INSERT INTO users (usr_name, usr_email, usr_password, usr_type)
-	VALUES ('Willian Santa Ana', 'willian@email.com', '123456', 'admin');
+	VALUES ('Willian Santa Ana', 'willian@email.com', '$2b$10$SM3l2psCKsDHqIVmVkvpiu65KlrVhMD16pnuBMUB5mHyT6rdnBo2C', 'admin');
 INSERT INTO users (usr_name, usr_email, usr_password)
-	VALUES ('Jacinto Estima', 'jacinto@email.com', '123456');
+	VALUES ('Jacinto Estima', 'jacinto@email.com', '$2b$10$SM3l2psCKsDHqIVmVkvpiu65KlrVhMD16pnuBMUB5mHyT6rdnBo2C');
 INSERT INTO users (usr_name, usr_email, usr_password)
-	VALUES ('Miguel Boavida', 'miguel@email.com', '123456');
+	VALUES ('Miguel Boavida', 'miguel@email.com', '$2b$10$SM3l2psCKsDHqIVmVkvpiu65KlrVhMD16pnuBMUB5mHyT6rdnBo2C');
 
 -- street_arts
 
