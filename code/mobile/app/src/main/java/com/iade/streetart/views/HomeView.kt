@@ -20,11 +20,11 @@ import com.iade.streetart.R
 @Composable
 fun HomeView(navController: NavController) {
 
-  Scaffold {
+  Scaffold { paddingValues ->
     Column(
       modifier = Modifier
         .fillMaxHeight()
-        .padding(top = 25.dp, bottom = 50.dp),
+        .padding(paddingValues),
       verticalArrangement = Arrangement.SpaceEvenly,
       horizontalAlignment = Alignment.CenterHorizontally
     ) {

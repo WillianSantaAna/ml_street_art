@@ -1,16 +1,25 @@
 package com.iade.streetart
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.rememberNavController
+import com.iade.streetart.models.UserLocalDataStore
 import com.iade.streetart.ui.theme.StreetArtTheme
+import com.iade.streetart.viewModels.UserViewModel
+
+private val Context.dataStore by preferencesDataStore(
+  name = "user"
+)
 
 class MainActivity : ComponentActivity() {
 
@@ -27,11 +36,12 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
 
     setContent {
-//      val appState = rememberAppState()
       val navController = rememberNavController()
+      val userLocalDataStore = remember { UserLocalDataStore(dataStore) }
+      val userViewModel = UserViewModel(userLocalDataStore)
 
       StreetArtTheme {
-        NavHost(navController = navController)
+        NavHost(navController = navController, userViewModel)
       }
     }
 

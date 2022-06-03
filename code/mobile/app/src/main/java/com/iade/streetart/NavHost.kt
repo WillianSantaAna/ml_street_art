@@ -1,7 +1,6 @@
 package com.iade.streetart
 
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,8 +8,17 @@ import com.iade.streetart.viewModels.UserViewModel
 import com.iade.streetart.views.*
 
 @Composable
-fun NavHost(navController: NavHostController) {
-  val userViewModel: UserViewModel = viewModel()
+fun NavHost(navController: NavHostController, userViewModel: UserViewModel) {
+
+  LaunchedEffect(true) {
+    val res = userViewModel.isUserLoggedIn()
+
+    if (res) {
+      navController.navigate("map") {
+        popUpTo("home") { inclusive = true }
+      }
+    }
+  }
 
   NavHost(
     navController = navController,
@@ -21,11 +29,11 @@ fun NavHost(navController: NavHostController) {
     }
 
     composable(NavRoutes.LoginView.route) {
-      LoginView(navController, userViewModel)
+      LoginViewState(navController, userViewModel)
     }
 
     composable(NavRoutes.SignInView.route) {
-      SignInView(navController, userViewModel)
+      SignInViewState(navController, userViewModel)
     }
 
     composable(NavRoutes.MapView.route) {

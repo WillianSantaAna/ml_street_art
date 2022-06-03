@@ -5,20 +5,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.iade.streetart.models.RetrofitHelper
-import com.iade.streetart.models.User
-import com.iade.streetart.models.UserForm
-import com.iade.streetart.models.UsersApi
+import com.iade.streetart.models.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class UserViewModel : ViewModel() {
+class UserViewModel(private val userLocalDataStore: UserLocalDataStore) : ViewModel() {
+
   private var _user by mutableStateOf<User?>(null)
 
-  private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
-
   val user: User
-    get() = _user ?: throw Exception("Failed to get the user")
+    get() = _user ?: User(0, "", "")
+
+  private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
   suspend fun login(email: String, password: String): String? {
     val res = withContext(Dispatchers.Default) {
@@ -29,6 +29,12 @@ class UserViewModel : ViewModel() {
       if (result.isSuccessful) {
         _user = result.body()!!
       }
+
+      userLocalDataStore.updatePreferences(
+        result.body()!!.usr_id,
+        result.body()!!.usr_name,
+        result.body()!!.usr_type
+      )
 
       result.message()
     }
@@ -47,6 +53,12 @@ class UserViewModel : ViewModel() {
         _user = result.body()!!
       }
 
+      userLocalDataStore.updatePreferences(
+        result.body()!!.usr_id,
+        result.body()!!.usr_name,
+        result.body()!!.usr_type
+      )
+
       result.message()
     }
 
@@ -55,6 +67,30 @@ class UserViewModel : ViewModel() {
   }
 
   fun logout() {
-    _user = null
+    CoroutineScope(Dispatchers.IO).launch {
+      userLocalDataStore.updatePreferences(0, "", "")
+      _user = null
+    }
+  }
+
+  suspend fun isUserLoggedIn(): Boolean {
+    val res = withContext(Dispatchers.Default) {
+      val localUser = userLocalDataStore.fetchInitialPreferences()
+      var result = false
+
+      Log.i("localUser", localUser.toString())
+      if (localUser.usr_id != 0 && localUser.usr_name != "" && localUser.usr_type != "") {
+        _user = localUser
+        Log.i("localUserTrue", localUser.toString())
+
+        result = true
+      } else {
+        _user = null
+      }
+
+      result
+    }
+
+    return res
   }
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.net.toUri
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.iade.streetart.models.PredictResult
 import com.iade.streetart.models.RetrofitHelper
@@ -38,8 +39,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.Executor
@@ -63,7 +66,7 @@ fun CameraView(modifier: Modifier = Modifier) {
       Box(modifier = modifier) {
         Image(
           modifier = Modifier.fillMaxSize(),
-          painter = rememberImagePainter(imageUri),
+          painter = rememberAsyncImagePainter(imageUri),
           contentDescription = "Captured image"
         )
 
@@ -74,21 +77,33 @@ fun CameraView(modifier: Modifier = Modifier) {
         ) {
           Button(
             onClick = {
-              val streetArtApi = RetrofitHelper.getInstance().create(StreetArtApi::class.java)
-              val file = imageUri.toFile()
-              val bitmap = decodeBitmapFromFile(imageUri.path!!, 1024, 1024)
-              bitmapToFile(bitmap, file)
+              try {
+                Log.i("uri", imageUri.encodedPath!!)
+                val streetArtApi = RetrofitHelper.getInstance().create(StreetArtApi::class.java)
+                val file = imageUri.toFile()
 
-              val reqFile = RequestBody.create(MediaType.parse("image/*"), file)
-              val body = MultipartBody.Part.createFormData("image", file.name, reqFile)
-              scope.launch {
-                val result = streetArtApi.predict(body)
+//                val file = File.createTempFile("image", "jpg")
+                val bitmap = decodeBitmapFromFile(imageUri.path!!, 1024, 1024)
 
-                if (result.isSuccessful) {
-                  predictResult = result.body()?.find { it.prediction > 0.33 }!!
-                  openDialog = true
+                Log.i("file path", file.path)
+
+
+                bitmapToFile(bitmap, file)
+
+                val reqFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                val body = MultipartBody.Part.createFormData("image", file.name, reqFile)
+                scope.launch {
+                  val result = streetArtApi.predict(body)
+
+                  if (result.isSuccessful) {
+                    predictResult = result.body()?.find { it.prediction > 0.33 }!!
+                    openDialog = true
+                  }
                 }
+              } catch (e: Exception) {
+                Log.e("error", e.message ?: "")
               }
+
             }) {
             Text(text = "Classify image")
           }

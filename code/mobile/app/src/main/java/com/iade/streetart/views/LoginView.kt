@@ -12,33 +12,77 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.iade.streetart.R
 import com.iade.streetart.viewModels.UserViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginView(navController: NavController, userViewModel: UserViewModel) {
+fun LoginViewState(navController: NavController, userViewModel: UserViewModel) {
 
   val scope = rememberCoroutineScope()
   val scaffoldState = rememberScaffoldState()
   val focusManager = LocalFocusManager.current
-  var email by remember { mutableStateOf("") }
-  var password by remember { mutableStateOf("") }
+  var email by rememberSaveable { mutableStateOf("") }
+  var password by rememberSaveable { mutableStateOf("") }
 
+  fun onLoginClick() {
+    scope.launch {
+      if (email.isNotEmpty() && password.isNotEmpty()) {
+        val res = userViewModel.login(email.trim(), password.trim())
+
+        if (res == "OK") {
+          navController.navigate("map") {
+            popUpTo("home") { inclusive = true }
+          }
+        } else {
+          email = ""
+          password = ""
+          focusManager.clearFocus(true)
+          scaffoldState.snackbarHostState.showSnackbar("Invalid credentials")
+        }
+      } else {
+        scaffoldState.snackbarHostState.showSnackbar("Please enter your email and password")
+      }
+    }
+  }
+
+  LoginView(
+    scaffoldState = scaffoldState,
+    focusManager = focusManager,
+    email = email,
+    onEmailChange = { email = it },
+    password = password,
+    onPasswordChange = { password = it },
+    onLoginClick = { onLoginClick() },
+    navigateBackClick = { navController.popBackStack() }
+  )
+
+}
+
+@Composable
+fun LoginView(
+  scaffoldState: ScaffoldState,
+  focusManager: FocusManager,
+  email: String,
+  onEmailChange: (String) -> Unit,
+  password: String,
+  onPasswordChange: (String) -> Unit,
+  onLoginClick: () -> Unit,
+  navigateBackClick: () -> Unit,
+) {
 
   Scaffold(
     scaffoldState = scaffoldState,
@@ -46,7 +90,7 @@ fun LoginView(navController: NavController, userViewModel: UserViewModel) {
       TopAppBar(
         navigationIcon = {
           IconButton(onClick = {
-            navController.popBackStack()
+            navigateBackClick()
           }) {
             Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "back")
           }
@@ -55,11 +99,12 @@ fun LoginView(navController: NavController, userViewModel: UserViewModel) {
         elevation = 4.dp,
       )
     },
-    content = {
+    content = { paddingValues ->
       Column(
         modifier = Modifier
           .fillMaxHeight()
-          .padding(top = 25.dp, bottom = 50.dp)
+          .padding(paddingValues)
+//          .padding(top = 25.dp, bottom = 50.dp)
           .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -77,7 +122,7 @@ fun LoginView(navController: NavController, userViewModel: UserViewModel) {
         OutlinedTextField(
           value = email,
           leadingIcon = { Icon(imageVector = Icons.Filled.Email, contentDescription = "email") },
-          onValueChange = { email = it },
+          onValueChange = onEmailChange,
           label = { Text(text = "Email") },
           placeholder = { Text(text = "Enter your email") },
           keyboardActions = KeyboardActions(onDone = { focusManager.moveFocus(FocusDirection.Down) }),
@@ -90,7 +135,7 @@ fun LoginView(navController: NavController, userViewModel: UserViewModel) {
         OutlinedTextField(
           value = password,
           leadingIcon = { Icon(imageVector = Icons.Filled.Lock, contentDescription = "password") },
-          onValueChange = { password = it },
+          onValueChange = onPasswordChange,
           label = { Text(text = "Password") },
           placeholder = { Text(text = "Enter your password") },
           visualTransformation = PasswordVisualTransformation(),
@@ -104,26 +149,7 @@ fun LoginView(navController: NavController, userViewModel: UserViewModel) {
         Button(
           modifier = Modifier.fillMaxWidth(0.5f),
           onClick = {
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-              scope.launch {
-                val res = userViewModel.login(email.trim(), password.trim())
-
-                if (res == "OK") {
-                  navController.navigate("map") {
-                    popUpTo("home") { inclusive = true }
-                  }
-                } else {
-                  email = ""
-                  password = ""
-                  focusManager.clearFocus(true)
-                  scaffoldState.snackbarHostState.showSnackbar("Invalid credentials")
-                }
-              }
-            } else {
-              scope.launch {
-                scaffoldState.snackbarHostState.showSnackbar("Please enter your email and password")
-              }
-            }
+            onLoginClick()
           }
         ) {
           Text(text = "Login")
@@ -131,12 +157,4 @@ fun LoginView(navController: NavController, userViewModel: UserViewModel) {
       }
     }
   )
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LoginViewPreview() {
-  MaterialTheme {
-    LoginView(rememberNavController(), viewModel())
-  }
 }

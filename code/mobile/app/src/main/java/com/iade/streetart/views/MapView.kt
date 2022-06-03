@@ -1,7 +1,7 @@
 package com.iade.streetart.views
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -9,9 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,7 +21,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.iade.streetart.R
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
 import com.iade.streetart.viewModels.UserViewModel
 import kotlinx.coroutines.launch
 
@@ -38,7 +43,7 @@ fun MapView(navController: NavController, userViewModel: UserViewModel) {
         navigationIcon = {
           IconButton(onClick = {
             scope.launch {
-                scaffoldState.drawerState.open()
+              scaffoldState.drawerState.open()
             }
           }) {
             Icon(imageVector = Icons.Filled.Menu, contentDescription = "menu")
@@ -74,7 +79,7 @@ fun MapView(navController: NavController, userViewModel: UserViewModel) {
         )
       }
     },
-    drawerGesturesEnabled = true,
+    drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
     drawerContent = {
       Column(
         modifier = Modifier
@@ -124,11 +129,12 @@ fun MapView(navController: NavController, userViewModel: UserViewModel) {
             .fillMaxWidth()
             .wrapContentHeight(),
           onClick = {
-            userViewModel.logout()
 
             navController.navigate("home") {
+              userViewModel.logout()
               popUpTo("map") { inclusive = true }
-          } }
+            }
+          }
         ) {
           Icon(imageVector = Icons.Filled.Logout, contentDescription = "logout")
           Text(text = "Logout")
@@ -136,20 +142,54 @@ fun MapView(navController: NavController, userViewModel: UserViewModel) {
         }
       }
     },
-    content = {
-      Image(
-        painter = painterResource(id = R.drawable.map),
-        contentDescription = "map",
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxSize()
-      )
+    content = { paddingValues ->
+      val lisbon = LatLng(38.72821, -9.14064)
+      val lisbon2 = LatLng(38.73, -9.135)
+      val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(lisbon, 10f)
+      }
+
+      GoogleMap(
+        modifier = Modifier.fillMaxSize().padding(paddingValues),
+        cameraPositionState = cameraPositionState
+      ) {
+//        val url = URL("https://res.cloudinary.com/fgsilva/image/upload/v1646029378/07-file-upload/tmp-1-1646029377762_koopnl.jpg")
+//        val image = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+
+        MarkerInfoWindow(
+          state = MarkerState(position = lisbon2),
+          title = "Lisbon2",
+          snippet = "Marker in Lisbon2",
+//          icon = BitmapDescriptorFactory.fromBitmap(image)
+        ) {
+          AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+              .data("https://res.cloudinary.com/fgsilva/image/upload/v1646029378/07-file-upload/tmp-1-1646029377762_koopnl.jpg")
+              .crossfade(true)
+              .allowHardware(false)
+              .build(),
+            contentDescription = "test",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+              .size(75.dp)
+              .clip(RoundedCornerShape(percent = 100))
+              .padding(paddingValues)
+          )
+        }
+
+//        Marker(
+//          state = MarkerState(position = lisbon),
+//          title = "Lisbon",
+//          snippet = "Marker in Lisbon"
+//        )
+      }
     },
   )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MapViewPreview () {
+fun MapViewPreview() {
   MaterialTheme {
     MapView(rememberNavController(), viewModel())
   }
