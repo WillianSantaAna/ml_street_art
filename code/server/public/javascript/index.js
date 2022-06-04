@@ -7,7 +7,7 @@ window.onload = async () => {
 
         try {
             const result = await $.ajax({
-                url: `/api/streetArts/predict`,
+                url: `/api/images/upload/street_art/1/user/1`,
                 method: "post",
                 data: formData,
                 processData: false,

@@ -24,7 +24,7 @@ module.exports.addImage = async (sta_id, usr_id, url) => {
     }
     
     const sql = "insert into images (img_sta_id, img_usr_id, img_url) values ($1, $2, $3) returning img_url";
-    const result = await pool.query(sql);
+    const result = await pool.query(sql, [sta_id, usr_id, url]);
 
     if (result.rows.length > 0) {
       return { status: 200, result: result.rows[0] };

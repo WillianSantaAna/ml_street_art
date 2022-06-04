@@ -9,8 +9,8 @@ router.get("/", async (req, res) => {
   res.status(status).send(result);
 });
 
-router.post("/", async (req, res) => {
-  const { sta_id, usr_id } = req.body;
+router.post("/upload/street_art/:sta_id/user/:usr_id", async (req, res) => {
+  const { sta_id, usr_id } = req.params;
   const upload = await cloudinary.uploader.upload(
     req.files.image.tempFilePath,
     {
@@ -18,6 +18,7 @@ router.post("/", async (req, res) => {
       folder: "street-art-images",
     }
   );
+
   const { status, result } = await imageModel.addImage(sta_id, usr_id, upload.secure_url);
 
   res.status(status).send(result);
