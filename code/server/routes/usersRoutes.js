@@ -6,7 +6,14 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   const { status, result } = await userModel.getAllUsers();
 
-  res.status(status).json(result);
+  res.status(status).send(result);
+});
+
+router.get("/:id/images", async (req, res) => {
+  const id = req.params.id;
+  const { status, result } = await userModel.getUserImages(id);
+
+  res.status(status).send(result);
 });
 
 router.post("/login", async (req, res) => {

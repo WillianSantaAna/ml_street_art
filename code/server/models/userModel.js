@@ -78,3 +78,15 @@ module.exports.login = async (user) => {
     return { status: 500, result: error };
   }
 };
+
+module.exports.getUserImages = async (id) => {
+  try {
+    const sql = `select * from images where img_usr_id = $1`;
+    const result = await pool.query(sql, [id]);
+
+    return { status: 200, result: result.rows };
+  } catch (error) {
+    console.log(error);
+    return { status: 500, result: error };
+  }
+};

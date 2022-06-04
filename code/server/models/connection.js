@@ -8,10 +8,10 @@ const types = pg.types;
 const pool = new Pool({
   connectionString,
   max: 10,
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,
-  },
+  // ssl: {
+  //   require: true,
+  //   rejectUnauthorized: false,
+  // },
 });
 
 types.setTypeParser(600, (val) => {
