@@ -8,6 +8,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
+import com.iade.streetart.models.ImagesApi
+import com.iade.streetart.models.PredictResult
+import com.iade.streetart.models.RetrofitHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
 import java.io.File
 import java.io.FileOutputStream
 
@@ -17,6 +23,22 @@ class ImageViewModel : ViewModel() {
 
   val imageUri: Uri
     get() = _imageUri
+
+  private val imagesApi = RetrofitHelper.getInstance().create(ImagesApi::class.java)
+
+  suspend fun addImage(streetArtId: Int, userId: Int, body: MultipartBody.Part): String {
+    val res = withContext(Dispatchers.Default) {
+      val result = imagesApi.addImage(streetArtId, userId, body)
+
+      if (result.isSuccessful) {
+        return@withContext result.body()!!.img_url
+      }
+
+      return@withContext ""
+    }
+
+    return res
+  }
 
   fun setImageUri(value: Uri) {
     _imageUri = value

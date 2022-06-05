@@ -3,18 +3,16 @@ package com.iade.streetart.views
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.iade.streetart.models.PredictResult
@@ -33,6 +31,7 @@ fun ImagePreviewViewState(
 ) {
 
   val scope = rememberCoroutineScope()
+  val scaffoldState = rememberScaffoldState()
   val imageUri = rememberSaveable { mutableStateOf(imageViewModel.imageUri) }
   var openDialog by rememberSaveable { mutableStateOf(false) }
   var predictResult by remember { mutableStateOf(PredictResult("", 0.0)) }
@@ -58,19 +57,29 @@ fun ImagePreviewViewState(
     }
   }
 
+  fun searchAuthor(author: String) {
+    openDialog = false
+    navController.navigate("search/$author")
+  }
+
   ImagePreviewView(
     imageUri = imageUri.value,
-    clearImageUri = {
+    scaffoldState = scaffoldState,
+    navigateBackClick = {
       navController.popBackStack()
       imageViewModel.clearImageUri()
     },
-    onPredictClick = { onPredictClick() }
+    navigateTo = {
+      navController.navigate(it)
+    },
+    onPredictClick = { onPredictClick() },
   )
 
   if (openDialog) {
     ResultDialog(
       predictResult = predictResult,
-      closeDialog = { openDialog = false }
+      closeDialog = { openDialog = false },
+      searchAuthor = { searchAuthor(it) }
     )
   }
 }
@@ -78,38 +87,71 @@ fun ImagePreviewViewState(
 @Composable
 fun ImagePreviewView(
   imageUri: Uri,
-  clearImageUri: () -> Unit,
+  scaffoldState: ScaffoldState,
+  navigateBackClick: () -> Unit,
+  navigateTo: (String) -> Unit,
   onPredictClick: () -> Unit,
 ) {
-  Box(modifier = Modifier) {
-    Image(
-      modifier = Modifier.fillMaxSize(),
-      painter = rememberAsyncImagePainter(imageUri),
-      contentDescription = "Captured image"
-    )
+  Scaffold(
+    scaffoldState = scaffoldState,
+    topBar = {
+      TopAppBar(
+        navigationIcon = {
+          IconButton(onClick = {
+            navigateBackClick()
+          }) {
+            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "back")
+          }
+        },
+        title = { Text(text = "Image preview") },
+        elevation = 4.dp,
+      )
+    },
+    content = { paddingValues ->
+      Column(
+        modifier = Modifier
+          .fillMaxHeight()
+          .padding(paddingValues),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
 
-    Row (
-      modifier = Modifier.align(Alignment.BottomCenter),
-      horizontalArrangement = Arrangement.SpaceEvenly,
-      verticalAlignment = Alignment.Bottom
-    ) {
-      Button(
-        onClick = { onPredictClick() }) {
-        Text(text = "Classify image")
-      }
+        Image(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp, bottom = 20.dp),
+          painter = rememberAsyncImagePainter(imageUri),
+          contentScale = ContentScale.FillWidth,
+          contentDescription = "Captured image"
+        )
 
-      Button(
-        onClick = { clearImageUri() }) {
-        Text(text = "Remove image")
+        Button(
+          modifier = Modifier.fillMaxWidth(0.5f),
+          onClick = { onPredictClick() }) {
+          Text(text = "Classify image")
+        }
+
+        Button(
+          modifier = Modifier.fillMaxWidth(0.5f),
+          onClick = { navigateTo("addStreetArt") }) {
+          Text(text = "Add Street Art")
+        }
+
+//        Button(
+//          modifier = Modifier.fillMaxWidth(0.5f),
+//          onClick = { navigateTo("addImage") }) {
+//          Text(text = "Add Image")
+//        }
       }
     }
-  }
+  )
 }
 
 @Composable
 fun ResultDialog(
   predictResult: PredictResult,
-  closeDialog: () -> Unit
+  closeDialog: () -> Unit,
+  searchAuthor: (String) -> Unit,
 ) {
   AlertDialog(
       onDismissRequest = closeDialog,
@@ -119,7 +161,9 @@ fun ResultDialog(
         val prediction = String.format("%.2f", predictResult.prediction * 100)
 
         Log.i("Prediction", predictResult.toString())
-        Text(text = "$author: $prediction%")
+        TextButton(onClick = { searchAuthor(author) }) {
+          Text(text = "$author: $prediction%")
+        }
       },
       buttons = {
         TextButton(onClick = closeDialog) {

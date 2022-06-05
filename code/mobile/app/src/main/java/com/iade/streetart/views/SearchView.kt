@@ -35,12 +35,12 @@ import com.iade.streetart.viewModels.StreetArtViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun SearchViewState(navController: NavController, streetArtViewModel: StreetArtViewModel) {
+fun SearchViewState(navController: NavController, streetArtViewModel: StreetArtViewModel, authorName: String = "") {
 
   val scope = rememberCoroutineScope()
   val scaffoldState = rememberScaffoldState()
   val focusManager = LocalFocusManager.current
-  var search by rememberSaveable { mutableStateOf("") }
+  var search by rememberSaveable { mutableStateOf(authorName.trim()) }
 
   LaunchedEffect(search) {
     launch {

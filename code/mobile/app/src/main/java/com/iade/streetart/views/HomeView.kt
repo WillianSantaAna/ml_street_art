@@ -75,7 +75,7 @@ fun HomeView(navController: NavController, userViewModel: UserViewModel) {
 
       OutlinedButton(
         modifier = Modifier.fillMaxWidth(0.5f),
-        onClick = { navController.navigate("signIn") }
+        onClick = { navController.navigate("signUp") }
       ) {
         Text(text = "Create Account")
       }

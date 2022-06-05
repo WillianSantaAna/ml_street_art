@@ -61,7 +61,32 @@ class StreetArtViewModel : ViewModel() {
     return res
   }
 
+  suspend fun addStreetArt(streetArt: StreetArtPost): Int {
+    val res = withContext(Dispatchers.Default) {
+      val result = streetArtApi.addStreetArt(streetArt)
+
+      if (result.isSuccessful) {
+        return@withContext result.body()!!.sta_id
+      }
+
+      return@withContext 0
+    }
+
+    return res
+  }
+
   fun getSingleStreetArt(id: Int) =
     _streetArts.find { it.sta_id == id }
-      ?: StreetArt(0, 0, "", 0,"", Coords(0.0, 0.0), "", "")
+      ?: StreetArt(
+        sta_id = 0,
+        sta_usr_id = 0,
+        sta_artist = "",
+        sta_project = "",
+        sta_year = 0,
+        sta_photo_credits = "",
+        sta_address = "",
+        sta_coords = Coords(0.0, 0.0),
+        sta_status = "",
+        img_url = ""
+      )
 }

@@ -29,7 +29,7 @@ fun NavHost(
       LoginViewState(navController, userViewModel)
     }
 
-    composable(NavRoutes.SignInView.route) {
+    composable(NavRoutes.SignUpView.route) {
       SignUpViewState(navController, userViewModel)
     }
 
@@ -45,8 +45,20 @@ fun NavHost(
       ImagePreviewViewState(navController, imageViewModel, streetArtViewModel)
     }
 
-    composable(NavRoutes.SearchView.route) {
-      SearchViewState(navController, streetArtViewModel)
+    composable(NavRoutes.AddImageView.route) {
+      AddImageViewState(navController, imageViewModel, streetArtViewModel)
+    }
+
+    composable(NavRoutes.AddStreetArtView.route) {
+      AddStreetArtViewState(navController, userViewModel, imageViewModel, streetArtViewModel)
+    }
+
+    composable(NavRoutes.SearchView.route) { backStackEntry ->
+      SearchViewState(
+        navController,
+        streetArtViewModel,
+        authorName = backStackEntry.arguments?.getString("authorName") ?: ""
+      )
     }
 
     composable(NavRoutes.SingleStreetArtView.route) { backStackEntry ->

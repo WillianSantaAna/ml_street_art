@@ -98,7 +98,7 @@ fun MapView(
         title = { Text(text = "Street Art Lisbon") },
         elevation = 4.dp,
         actions = {
-          IconButton(onClick = { pageNav("search") }) {
+          IconButton(onClick = { pageNav("search/ ") }) {
             Icon(imageVector = Icons.Filled.Search, contentDescription = "search")
           }
         }
@@ -142,7 +142,7 @@ fun MapView(
             .padding(vertical = 5.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
-          onClick = { pageNav("search") }
+          onClick = { pageNav("search/ ") }
         ) {
           Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
           Spacer(modifier = Modifier.width(10.dp))
