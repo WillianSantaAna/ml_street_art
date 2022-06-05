@@ -20,43 +20,85 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.iade.streetart.models.StreetArt
+import com.iade.streetart.models.User
 import com.iade.streetart.viewModels.StreetArtViewModel
 import com.iade.streetart.viewModels.UserViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun MapView(
+fun MapViewState(
   navController: NavController,
   userViewModel: UserViewModel,
   streetArtViewModel: StreetArtViewModel
 ) {
-
   val scaffoldState = rememberScaffoldState()
   val scope = rememberCoroutineScope()
   val user = userViewModel.user
   val streetArts = streetArtViewModel.streetArts
+
+  fun openSideBar() {
+    scope.launch {
+      scaffoldState.drawerState.open()
+    }
+  }
+
+  fun logout() {
+    navController.navigate("home") {
+      userViewModel.logout()
+      popUpTo("map") { inclusive = true }
+    }
+  }
+
+  fun streetArtNav(id: Int): Boolean {
+    scope.launch {
+      navController.navigate("streetArt/${id}")
+    }
+
+    return true
+  }
+
+  fun pageNav(location: String) {
+    scope.launch {
+      navController.navigate(location)
+    }
+  }
+
+  MapView(
+    scaffoldState = scaffoldState,
+    user = user,
+    streetArts = streetArts,
+    openSideBar = { openSideBar() },
+    logout = { logout() },
+    streetArtNav = { streetArtNav(it) },
+    pageNav = { pageNav(it) },
+  )
+}
+
+@Composable
+fun MapView(
+  scaffoldState: ScaffoldState,
+  user: User,
+  streetArts: List<StreetArt>,
+  openSideBar: () -> Unit,
+  logout: () -> Unit,
+  streetArtNav: (id: Int) -> Boolean,
+  pageNav: (location: String) -> Unit,
+  ) {
 
   Scaffold(
     scaffoldState = scaffoldState,
     topBar = {
       TopAppBar(
         navigationIcon = {
-          IconButton(onClick = {
-            scope.launch {
-              scaffoldState.drawerState.open()
-            }
-          }) {
+          IconButton(onClick = openSideBar) {
             Icon(imageVector = Icons.Filled.Menu, contentDescription = "menu")
           }
         },
         title = { Text(text = "Street Art Lisbon") },
         elevation = 4.dp,
         actions = {
-          IconButton(onClick = {
-            scope.launch {
-              navController.navigate("search")
-            }
-          }) {
+          IconButton(onClick = { pageNav("search") }) {
             Icon(imageVector = Icons.Filled.Search, contentDescription = "search")
           }
         }
@@ -66,11 +108,7 @@ fun MapView(
     floatingActionButton = {
       FloatingActionButton(
         elevation = FloatingActionButtonDefaults.elevation(4.dp),
-        onClick = {
-          scope.launch {
-            navController.navigate("camera")
-          }
-        },
+        onClick = { pageNav("camera") },
       ) {
         Icon(
           imageVector = Icons.Filled.CameraAlt,
@@ -104,49 +142,45 @@ fun MapView(
             .padding(vertical = 5.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
-          onClick = { /*TODO*/ }
+          onClick = { pageNav("search") }
         ) {
-          Icon(imageVector = Icons.Filled.Image, contentDescription = "gallery")
-          Text(text = "Gallery")
+          Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+          Spacer(modifier = Modifier.width(10.dp))
+          Text(text = "Search")
           Spacer(modifier = Modifier.weight(1f))
         }
 
         TextButton(
           modifier = Modifier
-            .padding(5.dp)
+            .padding(vertical = 5.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
-          onClick = { /*TODO*/ }
+          onClick = { pageNav("camera") }
         ) {
-          Icon(imageVector = Icons.Filled.Settings, contentDescription = "settings")
-          Text(text = "Settings")
+          Icon(imageVector = Icons.Filled.CameraAlt, contentDescription = "Camera")
+          Spacer(modifier = Modifier.width(10.dp))
+          Text(text = "Camera")
           Spacer(modifier = Modifier.weight(1f))
         }
 
         TextButton(
           modifier = Modifier
-            .padding(5.dp)
+            .padding(vertical = 5.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
-          onClick = {
-
-            navController.navigate("home") {
-              userViewModel.logout()
-              popUpTo("map") { inclusive = true }
-            }
-          }
+          onClick = { logout() }
         ) {
           Icon(imageVector = Icons.Filled.Logout, contentDescription = "logout")
+          Spacer(modifier = Modifier.width(10.dp))
           Text(text = "Logout")
           Spacer(modifier = Modifier.weight(1f))
         }
       }
     },
     content = { paddingValues ->
-      val lisbon = LatLng(38.72821, -9.14064)
-      val lisbon2 = LatLng(38.73, -9.135)
+      val lisbon = LatLng(38.71667, -9.13333)
       val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(lisbon, 15f)
+        position = CameraPosition.fromLatLngZoom(lisbon, 11f)
       }
 
       GoogleMap(
@@ -155,42 +189,14 @@ fun MapView(
           .padding(paddingValues),
         cameraPositionState = cameraPositionState
       ) {
-
-//        MarkerInfoWindow(
-//          state = MarkerState(position = lisbon2),
-//          title = "Lisbon2",
-//          snippet = "Marker in Lisbon2",
-////          icon = BitmapDescriptorFactory.fromBitmap(image)
-//        ) {
-//          AsyncImage(
-//            model = ImageRequest.Builder(LocalContext.current)
-//              .data("https://res.cloudinary.com/fgsilva/image/upload/v1646029378/07-file-upload/tmp-1-1646029377762_koopnl.jpg")
-//              .crossfade(true)
-//              .allowHardware(false)
-//              .build(),
-//            contentDescription = "test",
-//            contentScale = ContentScale.Crop,
-//            modifier = Modifier
-//              .size(75.dp)
-//              .clip(RoundedCornerShape(percent = 100))
-//              .padding(paddingValues)
-//          )
-//        }
         streetArts.map { streetArt ->
           val (lat, lng) = streetArt.sta_coords
 
           Marker(
             state = MarkerState(position = LatLng(lat, lng)),
-            onClick = {
-              scope.launch {
-                navController.navigate("streetArt/${streetArt.sta_id}")
-              }
-
-              true
-            }
+            onClick = { streetArtNav(streetArt.sta_id) }
           )
         }
-
       }
     },
   )

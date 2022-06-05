@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,12 +16,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -35,6 +39,7 @@ fun SearchViewState(navController: NavController, streetArtViewModel: StreetArtV
 
   val scope = rememberCoroutineScope()
   val scaffoldState = rememberScaffoldState()
+  val focusManager = LocalFocusManager.current
   var search by rememberSaveable { mutableStateOf("") }
 
   LaunchedEffect(search) {
@@ -43,10 +48,15 @@ fun SearchViewState(navController: NavController, streetArtViewModel: StreetArtV
     }
   }
 
-  val streetArts = streetArtViewModel.streetArts
+  val streetArts = if (search.isEmpty()) {
+    streetArtViewModel.streetArts
+  } else {
+    streetArtViewModel.streetArts.filter { it.sta_artist.contains(search, ignoreCase = true) }
+  }
 
   SearchView(
     scaffoldState = scaffoldState,
+    focusManager = focusManager,
     search = search,
     onSearchChange = { search = it },
     navigateBackClick = { navController.popBackStack() },
@@ -62,6 +72,7 @@ fun SearchViewState(navController: NavController, streetArtViewModel: StreetArtV
 @Composable
 fun SearchView(
   scaffoldState: ScaffoldState,
+  focusManager: FocusManager,
   search: String,
   onSearchChange: (String) -> Unit,
   navigateBackClick: () -> Unit,
@@ -80,8 +91,11 @@ fun SearchView(
         onValueChange = onSearchChange,
         maxLines = 1,
         singleLine = true,
-        placeholder = { Text(text = "Search")},
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        placeholder = { Text(text = "Search by the artist name")},
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        keyboardOptions = KeyboardOptions(
+          imeAction = ImeAction.Done,
+          keyboardType = KeyboardType.Text),
         leadingIcon = {
           IconButton(onClick = {
             navigateBackClick()

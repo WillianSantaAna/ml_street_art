@@ -32,7 +32,7 @@ fun NavHost(
     }
 
     composable(NavRoutes.MapView.route) {
-      MapView(navController, userViewModel, streetArtViewModel)
+      MapViewState(navController, userViewModel, streetArtViewModel)
     }
 
     composable(NavRoutes.CameraView.route) {

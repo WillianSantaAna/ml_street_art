@@ -37,7 +37,7 @@ fun SingleStreetArtViewState(
   val streetArt = streetArtViewModel.getSingleStreetArt(streetArtId.toInt())
   var images by rememberSaveable { mutableStateOf(listOf<Image>()) }
 
-  LaunchedEffect(streetArtId) {
+  LaunchedEffect(streetArt) {
     launch {
       images = streetArtViewModel.fetchImages(streetArt.sta_id)
     }
