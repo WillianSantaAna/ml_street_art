@@ -19,6 +19,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.iade.streetart.models.UserLocalDataStore
 import com.iade.streetart.ui.theme.StreetArtTheme
+import com.iade.streetart.viewModels.ImageViewModel
 import com.iade.streetart.viewModels.StreetArtViewModel
 import com.iade.streetart.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
       val navController = rememberNavController()
       val userLocalDataStore = remember { UserLocalDataStore(dataStore) }
       val userViewModel = UserViewModel(userLocalDataStore)
+      val imageViewModel = ImageViewModel()
       val streetArtViewModel = StreetArtViewModel()
 
       LaunchedEffect(Unit) {
@@ -62,6 +64,7 @@ class MainActivity : ComponentActivity() {
         NavHost(
           navController = navController,
           userViewModel =  userViewModel,
+          imageViewModel = imageViewModel,
           streetArtViewModel = streetArtViewModel,
         )
       }

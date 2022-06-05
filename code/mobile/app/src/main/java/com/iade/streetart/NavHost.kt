@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.iade.streetart.viewModels.ImageViewModel
 import com.iade.streetart.viewModels.StreetArtViewModel
 import com.iade.streetart.viewModels.UserViewModel
 import com.iade.streetart.views.*
@@ -12,6 +13,7 @@ import com.iade.streetart.views.*
 fun NavHost(
   navController: NavHostController,
   userViewModel: UserViewModel,
+  imageViewModel: ImageViewModel,
   streetArtViewModel: StreetArtViewModel,
 ) {
 
@@ -36,7 +38,11 @@ fun NavHost(
     }
 
     composable(NavRoutes.CameraView.route) {
-      CameraView()
+      CameraView(navController, imageViewModel)
+    }
+
+    composable(NavRoutes.ImagePreviewView.route) {
+      ImagePreviewViewState(navController, imageViewModel, streetArtViewModel)
     }
 
     composable(NavRoutes.SearchView.route) {

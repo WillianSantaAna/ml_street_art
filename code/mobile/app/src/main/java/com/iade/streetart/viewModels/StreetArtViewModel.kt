@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.iade.streetart.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
 
 class StreetArtViewModel : ViewModel() {
 
@@ -43,6 +44,20 @@ class StreetArtViewModel : ViewModel() {
     }
 
     Log.i("images", res.toString())
+    return res
+  }
+
+  suspend fun predict(body: MultipartBody.Part): List<PredictResult> {
+    val res = withContext(Dispatchers.Default) {
+      val result = streetArtApi.predict(body)
+
+      if (result.isSuccessful) {
+        return@withContext result.body()!!
+      }
+
+      return@withContext listOf<PredictResult>()
+    }
+
     return res
   }
 
