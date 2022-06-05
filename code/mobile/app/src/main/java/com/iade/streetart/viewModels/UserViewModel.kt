@@ -28,13 +28,13 @@ class UserViewModel(private val userLocalDataStore: UserLocalDataStore) : ViewMo
 
       if (result.isSuccessful) {
         _user = result.body()!!
-      }
 
-      userLocalDataStore.updatePreferences(
-        result.body()!!.usr_id,
-        result.body()!!.usr_name,
-        result.body()!!.usr_type
-      )
+        userLocalDataStore.updatePreferences(
+          result.body()!!.usr_id,
+          result.body()!!.usr_name,
+          result.body()!!.usr_type
+        )
+      }
 
       result.message()
     }

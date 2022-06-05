@@ -2,23 +2,36 @@ package com.iade.streetart.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.iade.streetart.R
+import com.iade.streetart.viewModels.UserViewModel
 
 @Composable
-fun HomeView(navController: NavController) {
+fun HomeView(navController: NavController, userViewModel: UserViewModel) {
+
+  LaunchedEffect(Unit) {
+    val res = userViewModel.isUserLoggedIn()
+
+    if (res) {
+      navController.navigate("map") {
+        popUpTo("home") { inclusive = true }
+      }
+    }
+  }
 
   Scaffold { paddingValues ->
     Column(
@@ -67,13 +80,5 @@ fun HomeView(navController: NavController) {
         Text(text = "Create Account")
       }
     }
-  }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun HomeViewPreview() {
-  MaterialTheme {
-    HomeView(rememberNavController())
   }
 }

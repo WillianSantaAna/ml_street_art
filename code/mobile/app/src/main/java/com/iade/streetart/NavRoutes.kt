@@ -6,4 +6,6 @@ sealed class NavRoutes(val route: String) {
   object SignInView: NavRoutes("signIn")
   object MapView: NavRoutes("map")
   object CameraView: NavRoutes("camera")
+  object SearchView: NavRoutes("search")
+  object SingleStreetArtView: NavRoutes("streetArt/{streetArtId}")
 }

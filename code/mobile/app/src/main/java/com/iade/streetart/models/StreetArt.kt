@@ -2,23 +2,21 @@ package com.iade.streetart.models
 
 import okhttp3.MultipartBody
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
+import retrofit2.http.*
 
 data class StreetArt (
   val sta_id: Int,
   val sta_usr_id: Int,
   val sta_artist: String,
-  val sta_project: String,
+//  val sta_project: String,
   val sta_year: Int,
-  val sta_photo_credits: String,
+//  val sta_photo_credits: String,
   val sta_address: String,
   val sta_coords: Coords,
   val sta_status: String,
-  val sta_published: Boolean,
-  val sta_active: Boolean,
+//  val sta_published: Boolean,
+//  val sta_active: Boolean,
+  val img_url: String
 )
 
 data class Coords (val lat: Double, val lng: Double)
@@ -27,7 +25,10 @@ data class PredictResult (val author: String, val prediction: Double)
 
 interface StreetArtApi {
   @GET("api/streetArts")
-  suspend fun getStreetArts() : Response<List<User>>
+  suspend fun getStreetArts() : Response<List<StreetArt>>
+
+  @GET("api/streetArts/{id}/images")
+  suspend fun getStreetArtImages(@Path("id") id: Int) : Response<List<Image>>
 
   @Multipart
   @POST("api/streetArts/predict")

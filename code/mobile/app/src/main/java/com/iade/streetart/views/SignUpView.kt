@@ -31,7 +31,7 @@ import com.iade.streetart.viewModels.UserViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignInViewState(navController: NavController, userViewModel: UserViewModel) {
+fun SignUpViewState(navController: NavController, userViewModel: UserViewModel) {
 
   val scope = rememberCoroutineScope()
   val scaffoldState = rememberScaffoldState()
@@ -40,7 +40,7 @@ fun SignInViewState(navController: NavController, userViewModel: UserViewModel) 
   var email by rememberSaveable { mutableStateOf("") }
   var password by rememberSaveable { mutableStateOf("") }
 
-  fun onSignInClick() {
+  fun onSignUpClick() {
     scope.launch {
       if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
         val res = userViewModel.register(name.trim(), email.trim(), password.trim())
@@ -61,7 +61,7 @@ fun SignInViewState(navController: NavController, userViewModel: UserViewModel) 
     }
   }
 
-  SignInView(
+  SignUpView(
     scaffoldState = scaffoldState,
     focusManager = focusManager,
     name = name,
@@ -70,13 +70,13 @@ fun SignInViewState(navController: NavController, userViewModel: UserViewModel) 
     onEmailChange = { email = it },
     password = password,
     onPasswordChange = { password = it },
-    onSignInClick = { onSignInClick() },
+    onSignUpClick = { onSignUpClick() },
     navigateBackClick = { navController.popBackStack() }
   )
 }
 
 @Composable
-fun SignInView(
+fun SignUpView(
   scaffoldState: ScaffoldState,
   focusManager: FocusManager,
   name: String,
@@ -85,7 +85,7 @@ fun SignInView(
   onEmailChange: (String) -> Unit,
   password: String,
   onPasswordChange: (String) -> Unit,
-  onSignInClick: () -> Unit,
+  onSignUpClick: () -> Unit,
   navigateBackClick: () -> Unit,
 ) {
 
@@ -167,7 +167,7 @@ fun SignInView(
         Button(
           modifier = Modifier.fillMaxWidth(0.5f),
           onClick = {
-            onSignInClick()
+            onSignUpClick()
           }
         ) {
           Text(text = "Create Account")

@@ -1,31 +1,26 @@
 package com.iade.streetart
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.iade.streetart.viewModels.StreetArtViewModel
 import com.iade.streetart.viewModels.UserViewModel
 import com.iade.streetart.views.*
 
 @Composable
-fun NavHost(navController: NavHostController, userViewModel: UserViewModel) {
-
-  LaunchedEffect(true) {
-    val res = userViewModel.isUserLoggedIn()
-
-    if (res) {
-      navController.navigate("map") {
-        popUpTo("home") { inclusive = true }
-      }
-    }
-  }
+fun NavHost(
+  navController: NavHostController,
+  userViewModel: UserViewModel,
+  streetArtViewModel: StreetArtViewModel,
+) {
 
   NavHost(
     navController = navController,
     startDestination = NavRoutes.HomeView.route
   ) {
     composable(NavRoutes.HomeView.route) {
-      HomeView(navController)
+      HomeView(navController, userViewModel)
     }
 
     composable(NavRoutes.LoginView.route) {
@@ -33,15 +28,27 @@ fun NavHost(navController: NavHostController, userViewModel: UserViewModel) {
     }
 
     composable(NavRoutes.SignInView.route) {
-      SignInViewState(navController, userViewModel)
+      SignUpViewState(navController, userViewModel)
     }
 
     composable(NavRoutes.MapView.route) {
-      MapView(navController, userViewModel)
+      MapView(navController, userViewModel, streetArtViewModel)
     }
 
     composable(NavRoutes.CameraView.route) {
       CameraView()
+    }
+
+    composable(NavRoutes.SearchView.route) {
+      SearchViewState(navController, streetArtViewModel)
+    }
+
+    composable(NavRoutes.SingleStreetArtView.route) { backStackEntry ->
+      SingleStreetArtViewState(
+        navController = navController,
+        streetArtViewModel = streetArtViewModel,
+        streetArtId = backStackEntry.arguments?.getString("streetArtId") ?: "0"
+      )
     }
   }
 }
