@@ -42,11 +42,11 @@ fun NavHost(
     }
 
     composable(NavRoutes.ImagePreviewView.route) {
-      ImagePreviewViewState(navController, imageViewModel, streetArtViewModel)
+      ImagePreviewViewState(navController, userViewModel, imageViewModel, streetArtViewModel)
     }
 
     composable(NavRoutes.AddImageView.route) {
-      AddImageViewState(navController, imageViewModel, streetArtViewModel)
+      AddImageViewState(navController, userViewModel, imageViewModel, streetArtViewModel)
     }
 
     composable(NavRoutes.AddStreetArtView.route) {

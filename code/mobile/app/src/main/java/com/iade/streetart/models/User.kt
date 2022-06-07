@@ -1,6 +1,5 @@
 package com.iade.streetart.models
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.first
@@ -9,9 +8,9 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 data class User (
-  val usr_id: Int,
-  val usr_name: String,
-  val usr_type: String
+  val usr_id: Int = 0,
+  val usr_name: String = "",
+  val usr_type: String = ""
 )
 
 data class UserForm(
@@ -21,9 +20,6 @@ data class UserForm(
 )
 
 interface UsersApi {
-//  @GET("api/users")
-//  suspend fun getUsers() : Response<List<User>>
-
   @POST("/api/users/login")
   suspend fun login(@Body form: UserForm) : Response<User>
 
@@ -32,23 +28,11 @@ interface UsersApi {
 }
 
 class UserLocalDataStore(private val dataStore: DataStore<Preferences>) {
-
   private object PreferencesKeys {
     val ID = intPreferencesKey("usr_id")
     val NAME = stringPreferencesKey("usr_name")
     val TYPE = stringPreferencesKey("usr_type")
   }
-
-//  val userPreferencesFlow = dataStore.data.catch { exception ->
-//    if (exception is IOException) {
-//      Log.e("UserLocalDataStorage", "error reading preferences.", exception)
-//      emit(emptyPreferences())
-//    } else {
-//      throw exception
-//    }
-//  }.map { preferences ->
-//    mapUserPreferences(preferences)
-//  }
 
   suspend fun updatePreferences(id: Int, name: String, type: String) {
     dataStore.edit { preferences ->
@@ -66,7 +50,6 @@ class UserLocalDataStore(private val dataStore: DataStore<Preferences>) {
     val usrName = preferences[PreferencesKeys.NAME] ?: ""
     val usrType = preferences[PreferencesKeys.TYPE] ?: ""
 
-    Log.i("localUser", User(usrId, usrName, usrType).toString())
     return User(usrId, usrName, usrType)
   }
 }

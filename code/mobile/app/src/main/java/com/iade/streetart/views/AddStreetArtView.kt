@@ -1,7 +1,6 @@
 package com.iade.streetart.views
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,7 +9,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -44,13 +46,12 @@ fun AddStreetArtViewState(
   val scope = rememberCoroutineScope()
   val scaffoldState = rememberScaffoldState()
   val focusManager = LocalFocusManager.current
-  val image = imageViewModel.imageUri
+  val imageUri = imageViewModel.imageUri
   var artist by rememberSaveable { mutableStateOf("") }
   var address by rememberSaveable { mutableStateOf("") }
   var coords by rememberSaveable { mutableStateOf("") }
 
   fun addStreetArt() {
-
     scope.launch {
       try {
         val streetArt = StreetArtPost(
@@ -64,9 +65,7 @@ fun AddStreetArtViewState(
           status = "existente"
         )
 
-        Log.i("streetArt", streetArt.toString())
         val streetArtId = streetArtViewModel.addStreetArt(streetArt)
-        Log.i("streetArtId", streetArtId.toString())
         val file = imageViewModel.uriToFile()
         val reqFile = file.asRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("image", file.name, reqFile)
@@ -74,8 +73,10 @@ fun AddStreetArtViewState(
         val imageUrl = imageViewModel.addImage(streetArtId, userViewModel.user.usr_id, body)
 
         if (imageUrl.isNotEmpty()) {
+          scaffoldState.snackbarHostState.showSnackbar("New street art add successfully")
           streetArtViewModel.fetchStreetArts()
           imageViewModel.clearImageUri()
+
           navController.navigate("map") {
             popUpTo("map") { inclusive = true }
           }
@@ -99,7 +100,7 @@ fun AddStreetArtViewState(
     focusManager = focusManager,
     navigateBackClick = { navController.popBackStack() },
     addStreetArt = { addStreetArt() },
-    image = image,
+    imageUri = imageUri,
     artist = artist,
     onArtistChange = { artist = it },
     address = address,
@@ -115,7 +116,7 @@ fun AddStreetArtView(
   focusManager: FocusManager,
   navigateBackClick: () -> Unit,
   addStreetArt: () -> Unit,
-  image: Uri,
+  imageUri: Uri,
   artist: String,
   onArtistChange: (String) -> Unit,
   address: String,
@@ -154,7 +155,7 @@ fun AddStreetArtView(
             .fillMaxWidth()
             .height(300.dp)
             .padding(top = 10.dp, bottom = 20.dp),
-          painter = rememberAsyncImagePainter(image),
+          painter = rememberAsyncImagePainter(imageUri),
           contentDescription = "Captured image"
         )
 

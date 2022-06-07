@@ -5,18 +5,16 @@ import retrofit2.Response
 import retrofit2.http.*
 
 data class StreetArt (
-  val sta_id: Int,
-  val sta_usr_id: Int,
-  val sta_artist: String,
-  val sta_project: String,
-  val sta_year: Int,
-  val sta_photo_credits: String,
-  val sta_address: String,
-  val sta_coords: Coords,
-  val sta_status: String,
-//  val sta_published: Boolean,
-//  val sta_active: Boolean,
-  val img_url: String
+  val sta_id: Int = 0,
+  val sta_usr_id: Int = 0,
+  val sta_artist: String = "",
+  val sta_project: String = "",
+  val sta_year: Int = 0,
+  val sta_photo_credits: String = "",
+  val sta_address: String = "",
+  val sta_coords: Coords = Coords(),
+  val sta_status: String = "",
+  val img_url: String = ""
 )
 
 data class StreetArtPost (
@@ -34,7 +32,7 @@ data class StreetArtResult (
   val sta_id: Int
 )
 
-data class Coords (val lat: Double, val lng: Double)
+data class Coords (val lat: Double = 0.0, val lng: Double = 0.0)
 
 data class PredictResult (val author: String, val prediction: Double)
 

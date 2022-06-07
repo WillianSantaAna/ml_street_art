@@ -1,6 +1,5 @@
 package com.iade.streetart.viewModels
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,7 +15,7 @@ class UserViewModel(private val userLocalDataStore: UserLocalDataStore) : ViewMo
   private var _user by mutableStateOf<User?>(null)
 
   val user: User
-    get() = _user ?: User(0, "", "")
+    get() = _user ?: User()
 
   private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
@@ -39,7 +38,6 @@ class UserViewModel(private val userLocalDataStore: UserLocalDataStore) : ViewMo
       result.message()
     }
 
-    Log.i("user", _user.toString())
     return res
   }
 
@@ -62,7 +60,6 @@ class UserViewModel(private val userLocalDataStore: UserLocalDataStore) : ViewMo
       result.message()
     }
 
-    Log.i("user", _user.toString())
     return res
   }
 
@@ -78,11 +75,8 @@ class UserViewModel(private val userLocalDataStore: UserLocalDataStore) : ViewMo
       val localUser = userLocalDataStore.fetchInitialPreferences()
       var result = false
 
-      Log.i("localUser", localUser.toString())
       if (localUser.usr_id != 0 && localUser.usr_name != "" && localUser.usr_type != "") {
         _user = localUser
-        Log.i("localUserTrue", localUser.toString())
-
         result = true
       } else {
         _user = null

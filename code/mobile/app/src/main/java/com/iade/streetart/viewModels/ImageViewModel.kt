@@ -9,7 +9,6 @@ import androidx.compose.runtime.setValue
 import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import com.iade.streetart.models.ImagesApi
-import com.iade.streetart.models.PredictResult
 import com.iade.streetart.models.RetrofitHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

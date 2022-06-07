@@ -91,7 +91,7 @@ fun SearchView(
         onValueChange = onSearchChange,
         maxLines = 1,
         singleLine = true,
-        placeholder = { Text(text = "Search by the artist name")},
+        placeholder = { Text(text = "Enter the artist name")},
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         keyboardOptions = KeyboardOptions(
           imeAction = ImeAction.Done,

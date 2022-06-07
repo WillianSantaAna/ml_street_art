@@ -105,36 +105,24 @@ fun SingleStreetArtView(
           modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 15.dp)
         ) {
-          if (streetArt.sta_artist.isNotEmpty()) {
-            Row {
-              Text(text = "Artist: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-              Text(text = streetArt.sta_artist, fontSize = 20.sp)
-              Spacer(modifier = Modifier.height(35.dp))
-            }
-          }
-          if (streetArt.sta_address.isNotEmpty()) {
-            Row {
-              Text(text = "Address: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-              Text(text = streetArt.sta_address, fontSize = 20.sp)
-              Spacer(modifier = Modifier.height(35.dp))
-            }
-          }
-          if (streetArt.sta_status.isNotEmpty()) {
-            Row {
-              Text(text = "Status: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-              Text(text = streetArt.sta_status, fontSize = 20.sp)
-              Spacer(modifier = Modifier.height(35.dp))
-            }
-          }
-          if (streetArt.sta_year != 0) {
-            Row {
-              Text(text = "Year: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-              Text(text = streetArt.sta_year.toString(), fontSize = 20.sp)
-              Spacer(modifier = Modifier.height(35.dp))
-            }
-          }
+
+          SingleAttribute(title = "Artist", value = streetArt.sta_artist)
+          SingleAttribute(title = "Address", value = streetArt.sta_address)
+          SingleAttribute(title = "Status", value = streetArt.sta_status)
+          SingleAttribute(title = "Year", value = streetArt.sta_year.toString())
         }
       }
     }
   )
+}
+
+@Composable
+fun SingleAttribute(title: String, value: String) {
+  if (value.isNotEmpty() || value != "0") {
+    Row {
+      Text(text = "$title: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+      Text(text = value, fontSize = 20.sp)
+      Spacer(modifier = Modifier.height(35.dp))
+    }
+  }
 }

@@ -1,7 +1,8 @@
 package com.iade.streetart.viewModels
 
-import android.util.Log
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.iade.streetart.models.*
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,6 @@ class StreetArtViewModel : ViewModel() {
       result.message()
     }
 
-    Log.i("streetArt", _streetArts.toString())
     return res
   }
 
@@ -43,7 +43,6 @@ class StreetArtViewModel : ViewModel() {
       return@withContext listOf<Image>()
     }
 
-    Log.i("images", res.toString())
     return res
   }
 
@@ -77,16 +76,5 @@ class StreetArtViewModel : ViewModel() {
 
   fun getSingleStreetArt(id: Int) =
     _streetArts.find { it.sta_id == id }
-      ?: StreetArt(
-        sta_id = 0,
-        sta_usr_id = 0,
-        sta_artist = "",
-        sta_project = "",
-        sta_year = 0,
-        sta_photo_credits = "",
-        sta_address = "",
-        sta_coords = Coords(0.0, 0.0),
-        sta_status = "",
-        img_url = ""
-      )
+      ?: StreetArt()
 }

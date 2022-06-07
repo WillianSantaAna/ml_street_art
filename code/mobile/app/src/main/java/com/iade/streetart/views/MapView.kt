@@ -5,6 +5,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,18 @@ fun MapViewState(
   val user = userViewModel.user
   val streetArts = streetArtViewModel.streetArts
 
+  if (streetArtViewModel.streetArts.isEmpty()) {
+    LaunchedEffect(Unit) {
+      launch {
+        try {
+          streetArtViewModel.fetchStreetArts()
+        } catch (ex: Exception) {
+          scaffoldState.snackbarHostState.showSnackbar("Failed to get street arts data, try again later")
+        }
+      }
+    }
+  }
+
   fun openSideBar() {
     scope.launch {
       scaffoldState.drawerState.open()
@@ -48,14 +61,6 @@ fun MapViewState(
       userViewModel.logout()
       popUpTo("map") { inclusive = true }
     }
-  }
-
-  fun streetArtNav(id: Int): Boolean {
-    scope.launch {
-      navController.navigate("streetArt/${id}")
-    }
-
-    return true
   }
 
   fun pageNav(location: String) {
@@ -70,7 +75,6 @@ fun MapViewState(
     streetArts = streetArts,
     openSideBar = { openSideBar() },
     logout = { logout() },
-    streetArtNav = { streetArtNav(it) },
     pageNav = { pageNav(it) },
   )
 }
@@ -82,7 +86,6 @@ fun MapView(
   streetArts: List<StreetArt>,
   openSideBar: () -> Unit,
   logout: () -> Unit,
-  streetArtNav: (id: Int) -> Boolean,
   pageNav: (location: String) -> Unit,
   ) {
 
@@ -185,16 +188,18 @@ fun MapView(
 
       GoogleMap(
         modifier = Modifier
-          .fillMaxSize()
-          .padding(paddingValues),
-        cameraPositionState = cameraPositionState
+          .fillMaxSize(),
+        cameraPositionState = cameraPositionState,
+        contentPadding = paddingValues
       ) {
         streetArts.map { streetArt ->
           val (lat, lng) = streetArt.sta_coords
 
           Marker(
             state = MarkerState(position = LatLng(lat, lng)),
-            onClick = { streetArtNav(streetArt.sta_id) }
+            title = streetArt.sta_artist,
+            snippet = "Click to see more...",
+            onInfoWindowClick = { pageNav("streetArt/${streetArt.sta_id}") }
           )
         }
       }

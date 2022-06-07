@@ -49,10 +49,8 @@ fun CameraView(
       onImageFile = { file ->
         imageViewModel.setImageUri(file.toUri())
         navController.navigate("preview")
-        Log.i("imageUri", imageViewModel.imageUri.toString())
       }
     )
-
   }
 }
 
@@ -150,7 +148,7 @@ fun CameraCapture(
 suspend fun ImageCapture.takePicture(executor: Executor): File {
   val photoFile = withContext(Dispatchers.IO) {
     kotlin.runCatching {
-      File.createTempFile("image", "jpg")
+      File.createTempFile("image", ".jpg")
     }.getOrElse { ex ->
       Log.e("TakePicture", "Failed to create temporary file", ex)
       File("/dev/null")

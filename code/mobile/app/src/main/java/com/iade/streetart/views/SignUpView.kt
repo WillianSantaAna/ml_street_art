@@ -42,21 +42,31 @@ fun SignUpViewState(navController: NavController, userViewModel: UserViewModel) 
 
   fun onSignUpClick() {
     scope.launch {
-      if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-        val res = userViewModel.register(name.trim(), email.trim(), password.trim())
+      try {
+        if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
+          val res = userViewModel.register(name.trim(), email.trim(), password.trim())
 
-        if (res == "OK") {
-          navController.navigate("map") {
-            popUpTo("home") { inclusive = true }
+          if (res == "OK") {
+            navController.navigate("map") {
+              popUpTo("home") { inclusive = true }
+            }
+          } else {
+            name = ""
+            email = ""
+            password = ""
+            focusManager.clearFocus(true)
+            scaffoldState.snackbarHostState.showSnackbar("Failed to create a new user")
           }
         } else {
-          email = ""
-          password = ""
-          focusManager.clearFocus(true)
-          scaffoldState.snackbarHostState.showSnackbar("Failed to create a new user")
+          scaffoldState.snackbarHostState.showSnackbar("Please enter your name, email and password")
         }
-      } else {
-        scaffoldState.snackbarHostState.showSnackbar("Please enter your name, email and password")
+      } catch (ex: Exception) {
+        name = ""
+        email = ""
+        password = ""
+        focusManager.clearFocus(true)
+
+        scaffoldState.snackbarHostState.showSnackbar("User creation failed, try again in a moment.")
       }
     }
   }

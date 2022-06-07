@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import com.iade.streetart.R
 import com.iade.streetart.viewModels.UserViewModel
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeoutException
 
 @Composable
 fun LoginViewState(navController: NavController, userViewModel: UserViewModel) {
@@ -40,22 +41,35 @@ fun LoginViewState(navController: NavController, userViewModel: UserViewModel) {
 
   fun onLoginClick() {
     scope.launch {
-      if (email.isNotEmpty() && password.isNotEmpty()) {
-        val res = userViewModel.login(email.trim(), password.trim())
+      try {
+        if (email.isNotEmpty() && password.isNotEmpty()) {
+          val res = userViewModel.login(email.trim(), password.trim())
 
-        if (res == "OK") {
-          navController.navigate("map") {
-            popUpTo("home") { inclusive = true }
+          if (res == "OK") {
+            navController.navigate("map") {
+              popUpTo("home") { inclusive = true }
+            }
+          } else {
+            email = ""
+            password = ""
+            focusManager.clearFocus(true)
+            scaffoldState.snackbarHostState.showSnackbar("Invalid credentials")
           }
         } else {
-          email = ""
-          password = ""
-          focusManager.clearFocus(true)
-          scaffoldState.snackbarHostState.showSnackbar("Invalid credentials")
+          scaffoldState.snackbarHostState.showSnackbar("Please enter your email and password")
         }
-      } else {
-        scaffoldState.snackbarHostState.showSnackbar("Please enter your email and password")
+      } catch (ex: Exception) {
+        email = ""
+        password = ""
+        focusManager.clearFocus(true)
+
+        if (ex is TimeoutException) {
+          scaffoldState.snackbarHostState.showSnackbar("Login failed, try again in a moment.")
+        } else {
+          scaffoldState.snackbarHostState.showSnackbar(ex.message ?: "Login failed, try again.")
+        }
       }
+
     }
   }
 
@@ -104,7 +118,6 @@ fun LoginView(
         modifier = Modifier
           .fillMaxHeight()
           .padding(paddingValues)
-//          .padding(top = 25.dp, bottom = 50.dp)
           .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
