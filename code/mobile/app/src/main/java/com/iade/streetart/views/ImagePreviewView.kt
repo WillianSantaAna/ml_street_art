@@ -50,7 +50,11 @@ fun ImagePreviewViewState(
         val result = streetArtViewModel.predict(body)
 
         if (result.isNotEmpty()) {
-          predictResult = result.find { it.prediction > 0.33 }!!
+          result.forEach {
+            if (it.prediction > predictResult.prediction) {
+              predictResult = it
+            }
+          }
           openDialog = true
         }
       } catch (e: Exception) {
