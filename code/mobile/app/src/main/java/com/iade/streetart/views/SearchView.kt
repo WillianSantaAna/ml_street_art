@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.iade.streetart.models.StreetArt
+import com.iade.streetart.ui.theme.White
 import com.iade.streetart.viewModels.StreetArtViewModel
 import kotlinx.coroutines.launch
 
@@ -162,6 +163,7 @@ fun ImageCard(streetArt: StreetArt, onCardClick: () -> Unit) {
 
       Text(
         text = streetArt.sta_artist,
+        color= White,
         modifier = Modifier
           .align(Alignment.BottomStart)
           .padding(8.dp)
