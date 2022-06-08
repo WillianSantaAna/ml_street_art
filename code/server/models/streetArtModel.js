@@ -1,7 +1,7 @@
 const pool = require("./connection");
 const tf = require('@tensorflow/tfjs-node');
 const Jimp = require('jimp');
-const labels = ["Bordalo 2", "LS", "Mar", "Pariz One", "União Artistica do Trancão"];
+const labels = ["Bordalo 2", "LS", "Mar", "Pariz One", "Uniao Artistica"];
 
 module.exports.getAllStreetArts = async () => {
   try {
